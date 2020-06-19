@@ -252,6 +252,8 @@ def telegram_shot(msg):
 			cfg.camera_is_busy = True
 
 		cam = cv2.VideoCapture(cfg.camera_device) #, cv2.CAP_DSHOW - добавить только в Windows
+		if not cam.isOpened():
+			cam.open() # рекомендовано разработчиком, камера не всегда открыватеся сразу
 		cam.set(cv2.CAP_PROP_FRAME_WIDTH , cfg.camera_image_frame_width)
 		cam.set(cv2.CAP_PROP_FRAME_HEIGHT, cfg.camera_image_frame_height)
 
@@ -338,6 +340,8 @@ def telegram_video(msg, single:bool, testFPS:bool=False):
 			cfg.camera_is_busy = True
 
 		cam = cv2.VideoCapture(cfg.camera_device) #, cv2.CAP_DSHOW - добавить только в Windows
+		if not cam.isOpened():
+			cam.open() # рекомендовано разработчиком, камера не всегда открыватеся сразу
 		fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 		recfile = (filename if single else f"temp/{filename}")
 		out = cv2.VideoWriter(recfile, fourcc, cfg.camera_FPS,
@@ -346,7 +350,7 @@ def telegram_video(msg, single:bool, testFPS:bool=False):
 		if testFPS:
 			fps = FPS().start()
 
-		while duration > 0:
+		while duration > 0 and cam.isOpened():
 			ret, frame = cam.read()
 			if ret:
 				out.write(frame)
